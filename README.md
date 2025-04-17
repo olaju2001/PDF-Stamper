@@ -1,5 +1,9 @@
 # PDF Stamper Documentation
 
+## Other Languages
+
+*Read this in other languages: [Deutsch](README.de.md)*
+
 ## Overview
 
 PDF Stamper is a web application that allows users to upload PDF files, view thumbnails of the first page, apply text stamps to the documents, and download or delete the processed files. The application consists of a Spring Boot backend and a React frontend.
@@ -160,20 +164,6 @@ Detailed step-by-step testing instructions are available in the "Backend testing
 2. Run `npm install` to install dependencies
 3. Configure the API base URL in `FileService.js` if needed
 4. Run `npm start` to start the development server
-
-## Development Timeline
-
-Based on the requirements checklist, the total estimated development time is 8-10 hours:
-
-- Backend implementation: 4-5 hours
-- Frontend implementation: 4-5 hours
-
-## Security Considerations
-
-- Secure file handling
-- Input validation
-- Proper error handling
-- CORS configuration
 
 ## Future Enhancements
 
