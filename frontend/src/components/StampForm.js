@@ -5,7 +5,7 @@ import FileService from '../services/FileService';
 
 const StampForm = ({ file, onFileStamped }) => {
   const [stampData, setStampData] = useState({
-    date: new Date().toLocaleDateString(),
+    date: new Date().toLocaleDateString('de-DE'),
     name: '',
     comment: ''
   });
@@ -25,26 +25,52 @@ const StampForm = ({ file, onFileStamped }) => {
     e.preventDefault();
     
     if (!file) {
-      setMessage('Please select a PDF file first');
+      setMessage('Bitte wählen Sie zuerst eine PDF-Datei aus');
       setIsError(true);
+      return;
+    }
+
+    // Determine the file name property (some APIs use name, others use fileName)
+    const fileName = file.name || file.fileName;
+    
+    // Debug logging
+    console.log("Stamping file:", fileName);
+    console.log("File object:", file);
+    
+    if (!fileName) {
+      setMessage('Der Dateiname für den Stempel kann nicht ermittelt werden. Das Dateiobjekt könnte ungültig sein.');
+      setIsError(true);
+      console.error("Invalid file object:", file);
       return;
     }
 
     try {
       setIsStamping(true);
-      setMessage('Applying stamp...');
+      setMessage('Stempel wird angewendet...');
       setIsError(false);
 
-      const response = await FileService.stampFile(file.fileName, stampData);
+      const response = await FileService.stampFile(fileName, stampData);
       
-      setMessage('Stamp applied successfully');
+      setMessage('Stempel erfolgreich angewendet');
       
       // Call the parent callback to refresh the preview
       if (onFileStamped) {
         onFileStamped(response.data);
       }
     } catch (error) {
-      setMessage(`Failed to apply stamp: ${error.response?.data?.message || error.message}`);
+      // Extract more detailed error message if available
+      let errorMsg = "Fehler beim Anwenden des Stempels";
+      
+      if (error.response && error.response.data) {
+        errorMsg += `: ${error.response.data.message || error.response.statusText}`;
+      } else if (error.message) {
+        errorMsg += `: ${error.message}`;
+      }
+      
+      // Log detailed error info
+      console.error("Stamp error details:", error);
+      
+      setMessage(errorMsg);
       setIsError(true);
     } finally {
       setIsStamping(false);
@@ -53,14 +79,14 @@ const StampForm = ({ file, onFileStamped }) => {
 
   return (
     <div className="stamp-form mb-4 p-3 border rounded">
-      <h3>Apply Stamp</h3>
+      <h3>Stempel anwenden</h3>
       
       {!file ? (
-        <p className="text-muted">Select a PDF from the list to apply a stamp.</p>
+        <p className="text-muted">Wählen Sie eine PDF aus der Liste aus, um einen Stempel anzuwenden.</p>
       ) : (
         <Form onSubmit={applyStamp}>
           <Form.Group className="mb-3" controlId="stampDate">
-            <Form.Label>Date</Form.Label>
+            <Form.Label>Datum</Form.Label>
             <Form.Control
               type="text"
               name="date"
@@ -77,44 +103,52 @@ const StampForm = ({ file, onFileStamped }) => {
               name="name"
               value={stampData.name}
               onChange={handleChange}
-              placeholder="Enter your name"
+              placeholder="Geben Sie Ihren Namen ein"
               required
             />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="stampComment">
-            <Form.Label>Comment</Form.Label>
+            <Form.Label>Kommentar</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
               name="comment"
               value={stampData.comment}
               onChange={handleChange}
-              placeholder="Enter your comment"
+              placeholder="Geben Sie Ihren Kommentar ein"
             />
           </Form.Group>
 
-          <Button 
-            variant="success" 
-            type="submit" 
-            disabled={isStamping}
-          >
-            {isStamping ? (
-              <>
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                  className="me-2"
-                />
-                Applying Stamp...
-              </>
-            ) : (
-              'Apply Stamp'
+          <div className="d-flex justify-content-between align-items-start">
+            <Button 
+              variant="success" 
+              type="submit" 
+              disabled={isStamping}
+            >
+              {isStamping ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    className="me-2"
+                  />
+                  Stempel wird angewendet...
+                </>
+              ) : (
+                'Stempel anwenden'
+              )}
+            </Button>
+            
+            {file && (
+              <div className="text-muted small">
+                Datei: {file.name || file.fileName}
+              </div>
             )}
-          </Button>
+          </div>
 
           {message && (
             <Alert 

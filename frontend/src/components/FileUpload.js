@@ -18,14 +18,14 @@ const FileUpload = ({ onFileUpload }) => {
       setIsError(false);
     } else {
       setSelectedFile(null);
-      setMessage('Please select a valid PDF file');
+      setMessage('Bitte wählen Sie eine gültige PDF-Datei aus');
       setIsError(true);
     }
   };
 
   const uploadFile = async () => {
     if (!selectedFile) {
-      setMessage('Please select a file first');
+      setMessage('Bitte wählen Sie zuerst eine Datei aus');
       setIsError(true);
       return;
     }
@@ -37,7 +37,7 @@ const FileUpload = ({ onFileUpload }) => {
       const response = await FileService.uploadFile(selectedFile);
       
       setProgress(100);
-      setMessage('File uploaded successfully');
+      setMessage('Datei erfolgreich hochgeladen');
       setIsError(false);
       
       // Call the parent callback to refresh file list
@@ -50,7 +50,7 @@ const FileUpload = ({ onFileUpload }) => {
       document.getElementById('fileInput').value = '';
     } catch (error) {
       setProgress(0);
-      setMessage(`Upload failed: ${error.response?.data?.message || error.message}`);
+      setMessage(`Upload fehlgeschlagen: ${error.response?.data?.message || error.message}`);
       setIsError(true);
     } finally {
       setIsUploading(false);
@@ -59,10 +59,10 @@ const FileUpload = ({ onFileUpload }) => {
 
   return (
     <div className="file-upload mb-4 p-3 border rounded">
-      <h3>Upload PDF</h3>
+      <h3>PDF hochladen</h3>
       
       <Form.Group controlId="fileInput" className="mb-3">
-        <Form.Label>Select PDF file</Form.Label>
+        <Form.Label>PDF-Datei auswählen</Form.Label>
         <Form.Control 
           type="file" 
           onChange={onFileChange} 
@@ -80,7 +80,7 @@ const FileUpload = ({ onFileUpload }) => {
         onClick={uploadFile} 
         disabled={!selectedFile || isUploading}
       >
-        {isUploading ? 'Uploading...' : 'Upload'}
+        {isUploading ? 'Wird hochgeladen...' : 'Hochladen'}
       </Button>
 
       {message && (
